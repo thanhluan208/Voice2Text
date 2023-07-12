@@ -3,31 +3,44 @@ import React from "react";
 import { useDropzone } from "react-dropzone";
 import CommonIcons from "../../Assets/Icons";
 import { useSave } from "../../Stores/cachedStore";
-import { cachedKeys } from "../../Constants";
+import { UPLOAD_API, cachedKeys } from "../../Constants";
+import httpServices from "../../Services/httpServices";
 
 const UploadFile = () => {
+  //! State
   const save = useSave();
 
-  const { getRootProps, getInputProps } =
-    useDropzone({
-      multiple: false,
-      onDragEnter: () => {
-        document.getElementById("dropzone").classList.add("dropping");
-      },
-      onDragLeave: () => {
-        document.getElementById("dropzone").classList.remove("dropping");
-      },
-      onDropAccepted: (files) => {
-        const source = URL.createObjectURL(files[0]);
-        save(cachedKeys.AUDIO_SOURCE, source);
-        save(cachedKeys.SHOW_PLAYBACK, true);
-        document.getElementById("dropzone").classList.remove("dropping");
-      },
-      onDropRejected: (files) => {
-        console.log("file", files);
-      },
-    });
+  const { getRootProps, getInputProps } = useDropzone({
+    multiple: false,
+    onDragEnter: () => {
+      document.getElementById("dropzone").classList.add("dropping");
+    },
+    onDragLeave: () => {
+      document.getElementById("dropzone").classList.remove("dropping");
+    },
+    onDropAccepted: (files) => {
+      const source = URL.createObjectURL(files[0]);
+      const formData = new FormData();
+      formData.append("audio", files[0]);
 
+      handleUpload(formData);
+
+      save(cachedKeys.AUDIO_SOURCE, source);
+      save(cachedKeys.SHOW_PLAYBACK, true);
+      document.getElementById("dropzone").classList.remove("dropping");
+    },
+    onDropRejected: (files) => {
+      console.log("file", files);
+    },
+  });
+
+  //! Function
+  const handleUpload = async (payload) => {
+    const response = await httpServices.post(UPLOAD_API, payload);
+    console.log("res", response);
+  };
+
+  //! Render
   return (
     <Box
       sx={{
