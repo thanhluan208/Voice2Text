@@ -38,4 +38,5 @@ class Services {
   }
 }
 
-export default new Services();
+// eslint-disable-next-line
+export default new Services()

@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { Bars, RECORD_API, cachedKeys } from "../../Constants";
 import { Box, Button, Typography } from "@mui/material";
 import Bar from "./Bar";
@@ -12,38 +12,33 @@ import httpServices from "../../Services/httpServices";
 const Soundway = () => {
   //! State
   const [recording, setRecording] = useState(false);
-  const [loading, setLoading] = useState(false);
+  const [loading] = useState(false);
   const [time, setTime] = useState(0);
   const save = useSave();
-  const {
-    startRecording,
-    stopRecording,
-    pauseRecording,
-    mediaBlobUrl,
-    status,
-  } = useReactMediaRecorder({
-    audio: true,
-    video: false,
-    echoCancellation: true,
-    blobPropertyBag: {
-      type: "audio/wav",
-    },
-    onStop: (blobUrl, blob) => {
-      save(cachedKeys.AUDIO_SOURCE, blobUrl);
-      save(cachedKeys.SHOW_PLAYBACK, true);
-
-      const file = new File([blob], "audio.wav", {
+  const { startRecording, stopRecording, pauseRecording } =
+    useReactMediaRecorder({
+      audio: true,
+      video: false,
+      echoCancellation: true,
+      blobPropertyBag: {
         type: "audio/wav",
-      });
+      },
+      onStop: (blobUrl, blob) => {
+        save(cachedKeys.AUDIO_SOURCE, blobUrl);
+        save(cachedKeys.SHOW_PLAYBACK, true);
 
-      console.log("asdasd", file);
+        const file = new File([blob], "audio.wav", {
+          type: "audio/wav",
+        });
 
-      const formData = new FormData();
-      formData.append("audio", file);
+        console.log("asdasd", file);
 
-      handleUpload(formData);
-    },
-  });
+        const formData = new FormData();
+        formData.append("audio", file);
+
+        handleUpload(formData);
+      },
+    });
 
   const recordInterval = React.useRef(null);
 

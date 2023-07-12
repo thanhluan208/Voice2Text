@@ -3,7 +3,7 @@ import React from "react";
 import { useDropzone } from "react-dropzone";
 import CommonIcons from "../../Assets/Icons";
 import { useSave } from "../../Stores/cachedStore";
-import { UPLOAD_API, cachedKeys } from "../../Constants";
+import { RECORD_API,  cachedKeys } from "../../Constants";
 import httpServices from "../../Services/httpServices";
 
 const UploadFile = () => {
@@ -36,7 +36,7 @@ const UploadFile = () => {
 
   //! Function
   const handleUpload = async (payload) => {
-    const response = await httpServices.post(UPLOAD_API, payload);
+    const response = await httpServices.post(RECORD_API, payload);
     console.log("res", response);
   };
 

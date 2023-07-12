@@ -1,11 +1,28 @@
-import { Box, TextField, Typography } from "@mui/material";
-import React, { useMemo } from "react";
+import { Box, Button, TextField, Typography } from "@mui/material";
+import React, { useMemo, useRef } from "react";
 import queryString from "query-string";
 import ReactYoutube from "react-youtube";
+import httpServices from "../../Services/httpServices";
+import { YOUTUBE_API } from "../../Constants";
 
 const Youtube = () => {
   //! State
   const [youtubeLink, setYoutubeLink] = React.useState("");
+
+  const validSource = useMemo(() => {
+    try {
+      const params = youtubeLink.split("?")[1];
+      const parsed = queryString.parse(params);
+      const videoId = parsed.v;
+
+      return videoId;
+    } catch (error) {
+      console.log(error);
+      return null;
+    }
+  }, [youtubeLink]);
+
+  const debounceRef = useRef(null);
 
   const opts = useMemo(() => {
     const width = window.innerWidth - 170 < 900 ? window.innerWidth - 170 : 900;
@@ -19,12 +36,18 @@ const Youtube = () => {
 
   //! Function
   const handleChange = (e) => {
+    if (debounceRef.current) {
+      clearTimeout(debounceRef.current);
+    }
+    debounceRef.current = setTimeout(() => {
+      setYoutubeLink(e.target.value);
+    }, 300);
+  };
+
+  const handleSubmit = async () => {
     try {
-      const url = e.target.value;
-      const params = url.split("?")[1];
-      const parsed = queryString.parse(params);
-      const videoId = parsed.v;
-      setYoutubeLink(videoId);
+      const response = await httpServices.post(YOUTUBE_API, youtubeLink);
+      console.log("response", response);
     } catch (error) {
       console.log(error);
     }
@@ -75,7 +98,7 @@ const Youtube = () => {
           <Typography variant="body1">Back</Typography>
         </Box>
       </Box>
-      <Box>
+      <Box sx={{ display: "flex", gap: "10px" }}>
         <TextField
           onChange={handleChange}
           label="Youtube link"
@@ -83,6 +106,9 @@ const Youtube = () => {
           variant="outlined"
           sx={{ width: "700px" }}
         />
+        <Button variant="contained" color="primary" onClick={handleSubmit}>
+          Submit
+        </Button>
       </Box>
       <Box
         sx={{
@@ -95,8 +121,8 @@ const Youtube = () => {
           marginTop: "20px",
         }}
       >
-        {youtubeLink ? (
-          <ReactYoutube videoId={youtubeLink} opts={opts} />
+        {validSource ? (
+          <ReactYoutube videoId={validSource} opts={opts} />
         ) : (
           <Box></Box>
         )}

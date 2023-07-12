@@ -1,21 +1,16 @@
 import React, { useCallback, useEffect, useState } from "react";
-import { useSocket } from "./SocketProvider";
 import { useNavigate, useParams } from "react-router-dom";
-import {cloneDeep} from 'lodash';
+import { useSocket } from "../../Providers/SocketProvider";
 
 const Room = () => {
-  const { socket } = useSocket();
+  const { socket, peer } = useSocket();
   const params = useParams();
   const navigate = useNavigate();
-  const [users, setUsers] = useState([]);
+  const [users] = useState([]);
 
   const listenToUserJoin = useCallback(() => {
-    socket.on("user-connected", (email) => {
-      setUsers((prev) => {
-        const nextPrev = cloneDeep(prev)
-        nextPrev.push(email);
-        return nextPrev;
-      });
+    socket.on("user-connected", (info) => {
+      console.log("info", info);
     });
   }, [socket]);
 
