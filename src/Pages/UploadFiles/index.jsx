@@ -8,7 +8,7 @@ import { cachedKeys } from "../../Constants";
 const UploadFile = () => {
   const save = useSave();
 
-  const { acceptedFiles, fileRejections, getRootProps, getInputProps } =
+  const { getRootProps, getInputProps } =
     useDropzone({
       multiple: false,
       onDragEnter: () => {

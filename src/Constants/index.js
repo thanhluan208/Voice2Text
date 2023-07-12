@@ -18,3 +18,8 @@ export const cachedKeys = {
   SHOW_PLAYBACK: "SHOW_PLAYBACK",
   AUDIO_SOURCE: "AUDIO_SOURCE",
 };
+
+export const API_URL = "http://localhost:5000";
+export const RECORD_API = `${API_URL}/record`;
+export const UPLOAD_API = `${API_URL}/upload`;
+export const YOUTUBE_API = `${API_URL}/youtube`;

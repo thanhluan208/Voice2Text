@@ -1,22 +1,55 @@
-import React, { useState } from "react";
-import { Bars, cachedKeys } from "../../Constants";
+import React, { useEffect, useState } from "react";
+import { Bars, RECORD_API, cachedKeys } from "../../Constants";
 import { Box, Button, Typography } from "@mui/material";
 import Bar from "./Bar";
 import CommonIcons from "../../Assets/Icons";
 import { formatMS } from "../../Helper";
 import TypingText from "./TypingText";
 import { useSave } from "../../Stores/cachedStore";
+import { useReactMediaRecorder } from "react-media-recorder";
+import httpServices from "../../Services/httpServices";
 
 const Soundway = () => {
   //! State
   const [recording, setRecording] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [time, setTime] = useState(0);
   const save = useSave();
+  const {
+    startRecording,
+    stopRecording,
+    pauseRecording,
+    mediaBlobUrl,
+    status,
+  } = useReactMediaRecorder({
+    audio: true,
+    video: false,
+    echoCancellation: true,
+    blobPropertyBag: {
+      type: "audio/wav",
+    },
+    onStop: (blobUrl, blob) => {
+      save(cachedKeys.AUDIO_SOURCE, blobUrl);
+      save(cachedKeys.SHOW_PLAYBACK, true);
+
+      const file = new File([blob], "audio.wav", {
+        type: "audio/wav",
+      });
+
+      console.log("asdasd", file);
+
+      const formData = new FormData();
+      formData.append("audio", file);
+
+      handleUpload(formData);
+    },
+  });
 
   const recordInterval = React.useRef(null);
 
   //! Function
   const handleStartRecording = () => {
+    startRecording(true);
     setRecording(true);
     recordInterval.current = setInterval(() => {
       setTime((prev) => prev + 1000);
@@ -24,16 +57,24 @@ const Soundway = () => {
   };
 
   const handleStopRecording = () => {
+    pauseRecording();
     setRecording(false);
     clearInterval(recordInterval.current);
   };
 
-  const handleSubmitRecord = () => {
+  const handleSubmitRecord = async () => {
+    stopRecording();
     save(cachedKeys.SHOW_PLAYBACK, true);
   };
 
   const handleReset = () => {
     setTime(0);
+  };
+
+  const handleUpload = async (payload, onSuccess) => {
+    const response = await httpServices.post(RECORD_API, payload);
+    console.log("response", response);
+    console.log("asdasd", payload);
   };
 
   //! Render
@@ -105,7 +146,7 @@ const Soundway = () => {
               },
             }}
             variant="outlined"
-            disabled={recording || time === 0}
+            disabled={loading || recording || time === 0}
             onClick={handleReset}
           >
             Reset
@@ -123,7 +164,7 @@ const Soundway = () => {
               },
             }}
             variant="contained"
-            disabled={recording || time === 0}
+            disabled={loading || recording || time === 0}
             onClick={handleSubmitRecord}
           >
             Submit

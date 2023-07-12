@@ -18,6 +18,7 @@ const Playback = () => {
 
   const source = useGet(cachedKeys.AUDIO_SOURCE);
 
+
   const audioRef = useRef();
 
   //! Function
@@ -72,11 +73,11 @@ const Playback = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      if (audioRef.current?.readyState === 4) {
+      if (audioRef.current) {
         setLoading(false);
         clearInterval(interval);
       }
-    }, []);
+    }, 200);
   }, []);
 
   //! Render
