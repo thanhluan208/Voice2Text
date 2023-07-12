@@ -3,18 +3,21 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSocket } from "../../Providers/SocketProvider";
 
 const Room = () => {
-  const { socket, peer } = useSocket();
+  const { socket,  handleConnectPeer, connectedPeer } = useSocket();
   const params = useParams();
   const navigate = useNavigate();
   const [users] = useState([]);
 
   const listenToUserJoin = useCallback(() => {
-    socket.on("user-connected", (info) => {
-      console.log("info", info);
+    socket.on("user-connected", (connectedPeerId) => {
+      console.log("connect to ", connectedPeerId);
+      handleConnectPeer(connectedPeerId);
     });
-  }, [socket]);
+  }, [socket, handleConnectPeer]);
 
-  console.log(users);
+  const handleClick = () => {
+    connectedPeer.send("hello");
+  };
 
   useEffect(() => {
     listenToUserJoin();
@@ -36,6 +39,7 @@ const Room = () => {
           return <li key={user}>{user}</li>;
         })}
       </ul>
+      <button onClick={handleClick}>click</button>
     </div>
   );
 };

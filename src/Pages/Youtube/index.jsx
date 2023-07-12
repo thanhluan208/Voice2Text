@@ -46,7 +46,10 @@ const Youtube = () => {
 
   const handleSubmit = async () => {
     try {
-      const response = await httpServices.post(YOUTUBE_API, youtubeLink);
+      const formdata = new FormData();
+      formdata.append("youtube_link", youtubeLink);
+
+      const response = await httpServices.post(YOUTUBE_API, formdata);
       console.log("response", response);
     } catch (error) {
       console.log(error);

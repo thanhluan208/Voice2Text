@@ -1,17 +1,17 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSocket } from "../../Providers/SocketProvider";
 import { useNavigate } from "react-router-dom";
 
 const Meeting = () => {
   //! State
   const { socket, peerId } = useSocket();
+  const [value, setValue] = useState("");
   const navigate = useNavigate();
 
   //! Function
   const handleJoin = () => {
-
     socket.emit("join-room", {
-      roomId: "692b5632-2942-427e-a676-d5464bb5641c",
+      roomId: value,
       peerId,
     });
   };
@@ -33,6 +33,12 @@ const Meeting = () => {
     <div>
       <button onClick={handleCreate}>Create room</button>
       <button onClick={handleJoin}>Join room</button>
+      <input
+        onChange={(e) => {
+          setValue(e.target.value);
+        }}
+        value={value}
+      />
     </div>
   );
 };

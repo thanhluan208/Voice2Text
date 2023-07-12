@@ -1,11 +1,13 @@
 import Peer from "peerjs";
-import React, { useEffect, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { Socket, io } from "socket.io-client";
 
 const SocketContext = React.createContext({
   socket: Socket,
   peer: Peer,
   peerId: "",
+  connectedPeer: "",
+  handleConnectPeer: () => {},
 });
 
 export const useSocket = () => {
@@ -15,6 +17,7 @@ export const useSocket = () => {
 const SocketProvider = ({ children }) => {
   //! State
   const [peerId, setPeerId] = React.useState("");
+  const [connectedPeer, setConnectedPeer] = React.useState();
 
   const socket = useMemo(() => {
     return io("http://localhost:3001");
@@ -24,11 +27,28 @@ const SocketProvider = ({ children }) => {
     return new Peer();
   }, []);
 
+  const handleConnectPeer = useCallback(
+    (peerId) => {
+      const conn = peer.connect(peerId);
+      setConnectedPeer(conn);
+    },
+    [peer]
+  );
+
   //! Function
   useEffect(() => {
     peer.on("open", (id) => {
       console.log("peerid:", id);
       setPeerId(id);
+    });
+
+    peer.on("connection", (conn) => {
+      console.log("connect to", conn.peer);
+      conn.on("data", (data) => {
+        console.log("data", data);
+      });
+
+      conn.send("hello");
     });
   }, [peer]);
 
@@ -38,8 +58,10 @@ const SocketProvider = ({ children }) => {
       socket,
       peer,
       peerId,
+      connectedPeer,
+      handleConnectPeer,
     };
-  }, [socket, peer, peerId]);
+  }, [socket, peer, peerId, connectedPeer, handleConnectPeer]);
 
   return (
     <SocketContext.Provider value={value}>{children}</SocketContext.Provider>
