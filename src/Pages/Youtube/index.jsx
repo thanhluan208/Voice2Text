@@ -76,7 +76,7 @@ const Youtube = () => {
       const response = await httpServices.post(YOUTUBE_API, formdata);
       console.log("response", response);
 
-      setTranscript(parseYoutubeTranscript(resposne.data));
+      setTranscript(parseYoutubeTranscript(response.data));
     } catch (error) {
       console.log(error);
     }
