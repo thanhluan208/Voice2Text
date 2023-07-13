@@ -28,7 +28,7 @@ const TypingText = ({ text = TEXT }) => {
 
   //! Render
   return (
-    <p>
+    <p style={{whiteSpace: 'pre-line'}}>
       {content}
       {tempContent.current !== baseContent && (
         <span

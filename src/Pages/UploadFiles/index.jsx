@@ -39,9 +39,11 @@ const UploadFile = () => {
   //! Function
   const handleUpload = async (payload) => {
     const response = await httpServices.post(RECORD_API, payload);
-    console.log("res", response);
 
     const transcript = response.data.reduce((acc, cur) => {
+      if (cur.includes(".")) {
+        return acc + cur.replace(".", ".\n");
+      }
       return acc + cur;
     }, "");
 
@@ -99,12 +101,14 @@ const UploadFile = () => {
         <p>Drag 'n' drop some files here, or click to select files</p>
         <em>(Only *.mp3 and *.wav audios will be accepted)</em>
       </Box>
-      <Box sx={{ marginTop: "30px" }}>
-        <Typography variant="h5"> Transciprt: </Typography>
-        <Box sx={{ maxWidth: "700px" }}>
-          <TypingText text={transcript} />
+      {transcript && (
+        <Box sx={{ marginTop: "30px" }}>
+          <Typography variant="h5"> Transciprt: </Typography>
+          <Box sx={{ maxWidth: "700px" }}>
+            <TypingText text={transcript} />
+          </Box>
         </Box>
-      </Box>
+      )}
     </Box>
   );
 };

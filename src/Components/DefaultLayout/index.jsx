@@ -27,7 +27,12 @@ const DefaultLayout = (props) => {
     >
       <Sidebar />
 
-      <Box sx={{ paddingLeft: "120px" }}>
+      <Box
+        sx={{
+          paddingLeft: "120px",
+          paddingBottom: shouldShowPlayback ? "100px" : 0,
+        }}
+      >
         <Suspense
           fallback={
             <Box>
