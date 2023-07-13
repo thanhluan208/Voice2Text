@@ -4,7 +4,7 @@ import { Box, Button, Typography } from "@mui/material";
 import Bar from "./Bar";
 import CommonIcons from "../../Assets/Icons";
 import { formatMS } from "../../Helper";
-import TypingText from "./TypingText";
+import TypingText from "../../Components/TypingText";
 import { useSave } from "../../Stores/cachedStore";
 import { useReactMediaRecorder } from "react-media-recorder";
 import httpServices from "../../Services/httpServices";

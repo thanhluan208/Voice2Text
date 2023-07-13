@@ -1,13 +1,15 @@
 import { Box, Typography } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
 import { useDropzone } from "react-dropzone";
 import CommonIcons from "../../Assets/Icons";
 import { useSave } from "../../Stores/cachedStore";
-import { RECORD_API,  cachedKeys } from "../../Constants";
+import { RECORD_API, cachedKeys } from "../../Constants";
 import httpServices from "../../Services/httpServices";
+import TypingText from "../../Components/TypingText";
 
 const UploadFile = () => {
   //! State
+  const [transcript, setTranscript] = useState("");
   const save = useSave();
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -38,6 +40,12 @@ const UploadFile = () => {
   const handleUpload = async (payload) => {
     const response = await httpServices.post(RECORD_API, payload);
     console.log("res", response);
+
+    const transcript = response.data.reduce((acc, cur) => {
+      return acc + cur;
+    }, "");
+
+    setTranscript(transcript);
   };
 
   //! Render
@@ -90,6 +98,12 @@ const UploadFile = () => {
         <CommonIcons.Upload style={{ width: "100px", height: "100px" }} />
         <p>Drag 'n' drop some files here, or click to select files</p>
         <em>(Only *.mp3 and *.wav audios will be accepted)</em>
+      </Box>
+      <Box sx={{ marginTop: "30px" }}>
+        <Typography variant="h5"> Transciprt: </Typography>
+        <Box sx={{ maxWidth: "700px" }}>
+          <TypingText text={transcript} />
+        </Box>
       </Box>
     </Box>
   );
