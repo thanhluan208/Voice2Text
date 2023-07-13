@@ -14,6 +14,7 @@ const Soundway = () => {
   const [recording, setRecording] = useState(false);
   const [loading] = useState(false);
   const [time, setTime] = useState(0);
+  const [transcript, setTranscript] = useState("");
   const save = useSave();
   const { startRecording, stopRecording, pauseRecording } =
     useReactMediaRecorder({
@@ -69,7 +70,7 @@ const Soundway = () => {
   const handleUpload = async (payload, onSuccess) => {
     const response = await httpServices.post(RECORD_API, payload);
     console.log("response", response);
-    console.log("asdasd", payload);
+    setTranscript(response?.data);
   };
 
   //! Render
@@ -166,12 +167,14 @@ const Soundway = () => {
           </Button>
         </Box>
       </Box>
-      <Box sx={{ marginTop: "30px" }}>
-        <Typography variant="h5"> Transciprt: </Typography>
-        <Box sx={{ maxWidth: "700px" }}>
-          <TypingText />
+      {transcript && (
+        <Box sx={{ marginTop: "30px" }}>
+          <Typography variant="h5"> Transciprt: </Typography>
+          <Box sx={{ maxWidth: "700px" }}>
+            <TypingText text={transcript} />
+          </Box>
         </Box>
-      </Box>
+      )}
     </Box>
   );
 };

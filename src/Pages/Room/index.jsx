@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { useSocket } from "../../Providers/SocketProvider";
 
 const Room = () => {
-  const { socket,  handleConnectPeer, connectedPeer } = useSocket();
+  const { socket, handleConnectPeer, connectedPeer, peerId } = useSocket();
   const params = useParams();
   const navigate = useNavigate();
   const [users] = useState([]);
@@ -13,9 +13,10 @@ const Room = () => {
       console.log("connect to ", connectedPeerId);
       handleConnectPeer(connectedPeerId);
     });
-  }, [socket, handleConnectPeer]);
+  }, [socket, handleConnectPeer, peerId]);
 
   const handleClick = () => {
+    console.log("connect", connectedPeer);
     connectedPeer.send("hello");
   };
 

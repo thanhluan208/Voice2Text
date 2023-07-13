@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 
 const Meeting = () => {
   //! State
-  const { socket, peerId } = useSocket();
+  const { socket, peerId, setListPeer } = useSocket();
   const [value, setValue] = useState("");
   const navigate = useNavigate();
 
@@ -26,7 +26,7 @@ const Meeting = () => {
       const { roomId } = roominfo;
       navigate(`/room/${roomId}`);
     });
-  }, [socket, navigate]);
+  }, [socket, navigate, peerId, setListPeer]);
 
   //! Render
   return (
