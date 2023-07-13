@@ -45,10 +45,8 @@ const UploadFile = () => {
     const response = await httpServices.post(RECORD_API, payload);
 
     const transcript = response.data.reduce((acc, cur) => {
-      if (cur.includes(".")) {
-        return acc + cur.replace(".", ".\n");
-      }
-      return acc + cur;
+     
+      return acc + cur + "\n";
     }, "");
 
     setTranscript(transcript);
