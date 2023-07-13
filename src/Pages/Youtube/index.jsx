@@ -1,13 +1,42 @@
-import { Box, Button, TextField, Typography } from "@mui/material";
-import React, { useMemo, useRef } from "react";
+import {
+  Box,
+  Button,
+  CircularProgress,
+  TextField,
+  Typography,
+} from "@mui/material";
+import React, { Fragment, useMemo, useRef, useState } from "react";
 import queryString from "query-string";
 import ReactYoutube from "react-youtube";
 import httpServices from "../../Services/httpServices";
 import { YOUTUBE_API } from "../../Constants";
+import { resposne } from "./mockdata";
+import { parseYoutubeTranscript } from "../../Helper";
 
 const Youtube = () => {
   //! State
   const [youtubeLink, setYoutubeLink] = React.useState("");
+  const [loadingVideo, setLoadingVideo] = useState(true);
+  const [countTime, setCountTime] = useState(0);
+  const [transcript, setTranscript] = useState(null);
+
+  const lastTranscript = useRef(null);
+
+  const currentTranscript = useMemo(() => {
+    if (!transcript) return null;
+
+    const foundTranscript = transcript.find((item) => {
+      return item.time === Math.floor(countTime) && item.time !== 0;
+    });
+
+    if (!foundTranscript) return lastTranscript.current;
+
+    lastTranscript.current = foundTranscript.text;
+    return foundTranscript.text;
+  }, [transcript, countTime]);
+
+  const timerRef = useRef(null);
+  const inputRef = useRef(null);
 
   const validSource = useMemo(() => {
     try {
@@ -22,8 +51,6 @@ const Youtube = () => {
     }
   }, [youtubeLink]);
 
-  const debounceRef = useRef(null);
-
   const opts = useMemo(() => {
     const width = window.innerWidth - 170 < 900 ? window.innerWidth - 170 : 900;
     const height = (width * 9) / 16;
@@ -35,25 +62,36 @@ const Youtube = () => {
   }, []);
 
   //! Function
-  const handleChange = (e) => {
-    if (debounceRef.current) {
-      clearTimeout(debounceRef.current);
-    }
-    debounceRef.current = setTimeout(() => {
-      setYoutubeLink(e.target.value);
-    }, 300);
-  };
 
   const handleSubmit = async () => {
     try {
+      const youtubeLink = inputRef.current.value;
+      setYoutubeLink(youtubeLink);
+
+      await new Promise((res) => setTimeout(res, 5000))
+
       const formdata = new FormData();
       formdata.append("youtube_link", youtubeLink);
 
       const response = await httpServices.post(YOUTUBE_API, formdata);
       console.log("response", response);
+
+      setTranscript(parseYoutubeTranscript(resposne.data));
     } catch (error) {
       console.log(error);
     }
+  };
+
+  const handlePlay = (event) => {
+    setCountTime(event.target.getCurrentTime());
+    timerRef.current = setInterval(() => {
+      setCountTime((prev) => prev + 1);
+    }, 1000);
+  };
+
+  const handlePause = (event) => {
+    setCountTime(event.target.getCurrentTime());
+    clearInterval(timerRef.current);
   };
 
   //! Render
@@ -103,13 +141,23 @@ const Youtube = () => {
       </Box>
       <Box sx={{ display: "flex", gap: "10px" }}>
         <TextField
-          onChange={handleChange}
           label="Youtube link"
           placeholder="https://www.youtube.com/watch?v=7nigXQS1Xb0&list=RDiIEjiBu1uQk&index=6&ab_channel=TAEYEON-Topic"
           variant="outlined"
+          inputRef={inputRef}
           sx={{ width: "700px" }}
         />
-        <Button variant="contained" color="primary" onClick={handleSubmit}>
+        <Button
+          variant="contained"
+          sx={{
+            background: "#000",
+            padding: "6px 30px",
+            "&:hover": {
+              background: "#000",
+            },
+          }}
+          onClick={handleSubmit}
+        >
           Submit
         </Button>
       </Box>
@@ -125,7 +173,44 @@ const Youtube = () => {
         }}
       >
         {validSource ? (
-          <ReactYoutube videoId={validSource} opts={opts} />
+          <Fragment>
+            <Box sx={{ position: "relative" }}>
+              <ReactYoutube
+                videoId={validSource}
+                opts={opts}
+                onReady={() => {
+                  setLoadingVideo(false);
+                }}
+                onPlay={handlePlay}
+                onPause={handlePause}
+              />
+              {transcript && !loadingVideo && (
+                <Box
+                  sx={{
+                    position: "absolute",
+                    left: "50%",
+                    bottom: "60px",
+                    transform: "translateX(-50%)",
+                    background: "rgba(0,0,0,0.5)",
+                    color: "#fff",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                    backdropFilter: "blur(2px)",
+                  }}
+                >
+                  {currentTranscript || 'transcriping...'}
+                </Box>
+              )}
+            </Box>
+            {loadingVideo ? (
+              <Box>
+                <CircularProgress />
+              </Box>
+            ) : (
+              <Box></Box>
+            )}
+          </Fragment>
         ) : (
           <Box></Box>
         )}

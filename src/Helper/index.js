@@ -9,3 +9,20 @@ export const formatMS = (ms) => {
 
   return `${formattedMinutes}:${formattedSeconds}`;
 };
+
+export const parseYoutubeTranscript = (data) => {
+  const lines = data.split("\n");
+  console.log(lines);
+
+  const parsedLines = lines.map((line) => {
+    const [time, text] = line.split("]");
+    const nextTime = time.replace("[", "");
+
+    return {
+      time: Number(nextTime),
+      text: text.trim(),
+    };
+  });
+
+  return parsedLines
+};

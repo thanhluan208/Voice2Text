@@ -10,6 +10,7 @@ import TypingText from "../../Components/TypingText";
 const UploadFile = () => {
   //! State
   const [transcript, setTranscript] = useState("");
+  const [loading, setLoading] = useState(false);
   const save = useSave();
 
   const { getRootProps, getInputProps } = useDropzone({
@@ -34,10 +35,12 @@ const UploadFile = () => {
     onDropRejected: (files) => {
       console.log("file", files);
     },
+    disabled: loading,
   });
 
   //! Function
   const handleUpload = async (payload) => {
+    setLoading(true);
     const response = await httpServices.post(RECORD_API, payload);
 
     const transcript = response.data.reduce((acc, cur) => {
@@ -48,6 +51,7 @@ const UploadFile = () => {
     }, "");
 
     setTranscript(transcript);
+    setLoading(false);
   };
 
   //! Render
@@ -96,7 +100,7 @@ const UploadFile = () => {
       </Box>
 
       <Box {...getRootProps({ className: "dropzone", id: "dropzone" })}>
-        <input {...getInputProps()} />
+        <input {...getInputProps()} disabled={loading} />
         <CommonIcons.Upload style={{ width: "100px", height: "100px" }} />
         <p>Drag 'n' drop some files here, or click to select files</p>
         <em>(Only *.mp3 and *.wav audios will be accepted)</em>
