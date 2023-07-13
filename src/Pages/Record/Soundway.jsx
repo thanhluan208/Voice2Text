@@ -28,6 +28,9 @@ const Soundway = () => {
         save(cachedKeys.AUDIO_SOURCE, blobUrl);
         save(cachedKeys.SHOW_PLAYBACK, true);
 
+        setTime(0);
+        setTranscript(null);
+
         const file = new File([blob], "audio.wav", {
           type: "audio/wav",
         });
@@ -45,7 +48,7 @@ const Soundway = () => {
 
   //! Function
   const handleStartRecording = () => {
-    startRecording(true);
+    startRecording();
     setRecording(true);
     recordInterval.current = setInterval(() => {
       setTime((prev) => prev + 1000);
@@ -60,11 +63,13 @@ const Soundway = () => {
 
   const handleSubmitRecord = async () => {
     stopRecording();
-    save(cachedKeys.SHOW_PLAYBACK, true);
   };
 
   const handleReset = () => {
     setTime(0);
+    save(cachedKeys.SHOW_PLAYBACK, false);
+    save(cachedKeys.AUDIO_SOURCE, null);
+    setTranscript("");
   };
 
   const handleUpload = async (payload, onSuccess) => {

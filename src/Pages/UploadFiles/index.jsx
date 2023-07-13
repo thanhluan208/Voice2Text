@@ -41,6 +41,7 @@ const UploadFile = () => {
   //! Function
   const handleUpload = async (payload) => {
     setLoading(true);
+    setTranscript(null);
     const response = await httpServices.post(RECORD_API, payload);
 
     const transcript = response.data.reduce((acc, cur) => {
