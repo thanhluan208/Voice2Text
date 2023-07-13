@@ -68,7 +68,6 @@ const Youtube = () => {
       const youtubeLink = inputRef.current.value;
       setYoutubeLink(youtubeLink);
 
-      await new Promise((res) => setTimeout(res, 5000))
 
       const formdata = new FormData();
       formdata.append("youtube_link", youtubeLink);
@@ -76,7 +75,7 @@ const Youtube = () => {
       const response = await httpServices.post(YOUTUBE_API, formdata);
       console.log("response", response);
 
-      setTranscript(parseYoutubeTranscript(response.data));
+      setTranscript(parseYoutubeTranscript(resposne.data));
     } catch (error) {
       console.log(error);
     }

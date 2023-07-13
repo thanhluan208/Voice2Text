@@ -69,8 +69,15 @@ const Soundway = () => {
 
   const handleUpload = async (payload, onSuccess) => {
     const response = await httpServices.post(RECORD_API, payload);
-    console.log("response", response);
-    setTranscript(response?.data);
+
+    const transcript = response.data.reduce((acc, cur) => {
+      if (cur.includes(".")) {
+        return acc + cur.replace(".", ".\n");
+      }
+      return acc + cur;
+    }, "");
+
+    setTranscript(transcript);
   };
 
   //! Render
